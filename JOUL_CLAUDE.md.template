@@ -1,0 +1,275 @@
+# Joul AI Call Answering - Claude Code Configuration
+
+**Project:** Joul AI Automation
+**Purpose:** AI-powered missed call answering service
+**Claude Code Skills & Resources:** Pre-configured for call handling workflows
+
+---
+
+## 🎯 Purpose & Goals
+
+This project uses Claude Code to:
+- **Intercept missed calls** and voicemail messages
+- **Analyze caller context** and intent
+- **Generate intelligent responses** (emails, callbacks, SMS, escalations)
+- **Remember caller history** and preferences
+- **Notify team members** of important calls
+- **Track quality metrics** and improvements
+
+---
+
+## 📞 Key Skills & Integrations
+
+### Voice Processing
+```bash
+# Install voice transcription
+npx skills add github:vimalk78/dictate
+```
+- Offline, private voice-to-text via faster-whisper
+- No cloud APIs, all processing local
+- Transcribes voicemail and call recordings
+
+### Memory Management
+```bash
+# Install call history memory
+npx skills add github:lukaszraczylo/claude-mnemonic
+```
+- Remembers caller information
+- Tracks previous interactions
+- Learns preferences and patterns
+
+### Notifications & Alerts
+```bash
+# Install notification system
+npx skills add github:DevinoSolutions/ai-agent-notifier
+```
+- Push notifications to team members
+- Desktop and mobile alerts
+- Zero-dependency, cross-platform
+
+### Agent Orchestration
+```bash
+# Install multi-agent collaboration
+npx skills add github:WenyuChiou/agent-collab-skills
+```
+- Task routing and splitting
+- Output reconciliation
+- Shared memory across agents
+
+### Observability & Monitoring
+```bash
+# Install agent monitoring
+npx skills add github:hoangsonww/Claude-Code-Agent-Monitor
+```
+- Real-time call processing dashboard
+- Tool usage tracking
+- Session performance metrics
+
+---
+
+## 🔌 Communication Channels
+
+### Slack Integration
+Use `claude-threads` to stream call handling live into Slack:
+```bash
+npx skills add github:anneschuth/claude-threads
+```
+
+### Telegram Remote Control
+Control agents via Telegram:
+```bash
+npx skills add github:Imolatte/tg-claude
+```
+
+### WhatsApp Integration
+Direct WhatsApp communication:
+```bash
+npx skills add github:Rich627/whatsapp-claude-plugin
+```
+
+---
+
+## 📊 Workflow: Incoming Call → AI Response
+
+```
+1. DETECT: Webhook receives missed call notification
+   ├─ Extract: Caller ID, time, voicemail content
+   └─ Context: Look up caller in memory (joul-mnemonic)
+
+2. PROCESS: Claude agent analyzes call
+   ├─ Agent 1: Transcribe voicemail (dictate)
+   ├─ Agent 2: Classify intent & sentiment
+   ├─ Agent 3: Generate response options
+   └─ Agent 4: Execute chosen action
+
+3. RESPOND: Send appropriate response
+   ├─ Email summary to company
+   ├─ SMS to caller (if enabled)
+   ├─ Slack notification to team
+   └─ Escalate if needed
+
+4. TRACK: Log everything
+   ├─ Save to memory (caller preferences learned)
+   ├─ Update observability dashboard
+   ├─ Calculate quality metrics
+   └─ Notify team of outcomes
+```
+
+---
+
+## 🛠️ Configuration
+
+### Enable Agent Memory
+Set in Claude Code settings:
+```json
+{
+  "context_type": "persistent",
+  "memory_backend": "mnemonic",
+  "call_history_retention": "6_months"
+}
+```
+
+### Configure Notifications
+```json
+{
+  "notifications": {
+    "important_calls": "push",
+    "escalations": "push + slack",
+    "all_calls": "log_only"
+  }
+}
+```
+
+### Set Up Observability
+```json
+{
+  "observability": {
+    "dashboard_url": "http://localhost:3000",
+    "track_metrics": [
+      "call_count",
+      "response_time",
+      "accuracy_score",
+      "cost_per_call"
+    ]
+  }
+}
+```
+
+---
+
+## 📋 Common Commands
+
+```bash
+# Start a call handling session
+claude --project=joul-call-answering
+
+# Run with memory enabled
+claude --memory=true
+
+# Enable all notifications
+claude --notify=all
+
+# Monitor session
+claude monitor --dashboard
+
+# Check call history
+claude memory list calls
+```
+
+---
+
+## 🔍 Expected Behavior
+
+When you start Claude Code for this project, you can expect:
+
+1. ✅ **Memory Loaded** - Caller history and preferences available
+2. ✅ **Notifications Active** - Alerts enabled for important calls
+3. ✅ **Voice Ready** - Voicemail transcription available
+4. ✅ **Dashboard Connected** - Observability tracking active
+5. ✅ **Team Channels** - Slack/Telegram integrations ready
+
+---
+
+## 📚 Learning Resources
+
+Before starting, read these for context:
+
+1. **[Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)** - Agent patterns
+2. **[Effective Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)** - Memory management
+3. **[Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system)** - Orchestration patterns
+
+---
+
+## 🚨 Important Notes
+
+### Privacy & Security
+- ✅ All voice processing happens locally (offline)
+- ✅ No transcripts sent to external services
+- ✅ Caller information encrypted in memory
+- ✅ Access logs tracked via observability stack
+
+### Performance Considerations
+- Voice transcription: ~2-5 seconds per minute of audio
+- Agent response time: ~5-15 seconds
+- Memory lookups: <100ms with caching
+- Monitor dashboard: Real-time with <1s latency
+
+### Cost Optimization
+- Use token counting to track API usage
+- Batch similar calls for efficiency
+- Cache common responses
+- Monitor cost per call via observability stack
+
+---
+
+## 🤝 Team Collaboration
+
+For team visibility, ensure:
+- [ ] Slack thread streaming enabled (`claude-threads`)
+- [ ] Push notifications configured (`ai-agent-notifier`)
+- [ ] Dashboard URL shared with team
+- [ ] WhatsApp/Telegram integrations set up
+- [ ] Daily sync on call metrics
+
+---
+
+## 📞 Quick Reference: Phone System Integration
+
+Your phone system should POST to Claude Code webhook:
+
+```json
+{
+  "event": "missed_call",
+  "caller_id": "+1234567890",
+  "timestamp": "2026-10-03T14:35:00Z",
+  "voicemail_url": "https://voicemail-storage/abc123.wav",
+  "caller_name": "John Doe"  // optional
+}
+```
+
+Claude will:
+1. Fetch voicemail audio
+2. Transcribe locally
+3. Look up caller history
+4. Generate response
+5. POST response back to your system
+
+---
+
+## ✅ Checklist: First Run
+
+- [ ] Install all required skills
+- [ ] Configure notification channels
+- [ ] Set up memory backend
+- [ ] Start observability dashboard
+- [ ] Test with sample voicemail
+- [ ] Verify notifications work
+- [ ] Check memory persistence
+- [ ] Review agent logs
+
+---
+
+**Author:** Joul AI Team
+**Last Updated:** 2026-10-03
+**Status:** Ready for deployment
+**Support:** See joul-starter-kit.md for full resource guide

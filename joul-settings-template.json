@@ -1,0 +1,213 @@
+{
+  "comment": "Joul AI Call Answering - Claude Code Settings Template",
+  "comment2": "Copy this to .claude/settings.json in your joul project directory",
+  "version": "1.0",
+  "project_name": "joul-call-answering",
+
+  "// SKILLS - Pre-configured for call handling": {},
+  "skills": [
+    {
+      "id": "voice-transcription",
+      "source": "github:vimalk78/dictate",
+      "enabled": true,
+      "description": "Offline voice-to-text transcription"
+    },
+    {
+      "id": "call-memory",
+      "source": "github:lukaszraczylo/claude-mnemonic",
+      "enabled": true,
+      "description": "Caller history and context memory"
+    },
+    {
+      "id": "notifications",
+      "source": "github:DevinoSolutions/ai-agent-notifier",
+      "enabled": true,
+      "description": "Push notifications for incoming calls"
+    },
+    {
+      "id": "agent-collaboration",
+      "source": "github:WenyuChiou/agent-collab-skills",
+      "enabled": true,
+      "description": "Multi-agent coordination and routing"
+    },
+    {
+      "id": "monitoring-dashboard",
+      "source": "github:hoangsonww/Claude-Code-Agent-Monitor",
+      "enabled": true,
+      "description": "Real-time call processing visibility"
+    }
+  ],
+
+  "// PLUGINS - Communication & Control": {},
+  "plugins": [
+    {
+      "id": "slack-integration",
+      "source": "github:anneschuth/claude-threads",
+      "enabled": false,
+      "description": "Stream call handling to Slack threads"
+    },
+    {
+      "id": "telegram-control",
+      "source": "github:Imolatte/tg-claude",
+      "enabled": false,
+      "description": "Control agents via Telegram bot"
+    },
+    {
+      "id": "whatsapp-channel",
+      "source": "github:Rich627/whatsapp-claude-plugin",
+      "enabled": false,
+      "description": "Direct WhatsApp communication"
+    }
+  ],
+
+  "// HOOKS - Automated Behaviors": {},
+  "hooks": {
+    "on_session_start": [
+      "load-joul-memory",
+      "initialize-notifier",
+      "start-monitoring-dashboard"
+    ],
+    "on_tool_call": [
+      "log-call-event",
+      "update-observability-trace"
+    ],
+    "on_tool_result": [
+      "save-call-metadata",
+      "update-caller-memory"
+    ],
+    "on_session_end": [
+      "persist-call-summary",
+      "update-metrics",
+      "send-team-notification"
+    ]
+  },
+
+  "// CONTEXT & MEMORY": {},
+  "context": {
+    "type": "persistent",
+    "memory_backend": "mnemonic",
+    "max_call_history": 1000,
+    "retention_days": 180,
+    "auto_load_caller_history": true
+  },
+
+  "// NOTIFICATIONS": {},
+  "notifications": {
+    "enabled": true,
+    "channels": {
+      "important_calls": ["push", "slack", "email"],
+      "escalations": ["push", "slack", "sms"],
+      "regular_calls": ["log"],
+      "errors": ["push", "slack", "email"]
+    },
+    "ntfy_topic": "joul-calls",
+    "slack_webhook": "${JOUL_SLACK_WEBHOOK}",
+    "sms_provider": "twilio"
+  },
+
+  "// OBSERVABILITY & MONITORING": {},
+  "observability": {
+    "enabled": true,
+    "dashboard_url": "http://localhost:3000",
+    "backend": "otel",
+    "metrics": {
+      "track": [
+        "calls_processed",
+        "response_time_ms",
+        "accuracy_score",
+        "cost_per_call",
+        "transcription_quality",
+        "agent_success_rate"
+      ],
+      "export_interval_seconds": 60
+    },
+    "logs": {
+      "level": "INFO",
+      "include_transcripts": true,
+      "include_memory_lookups": true
+    }
+  },
+
+  "// VOICE PROCESSING": {},
+  "voice": {
+    "transcriber": "faster-whisper",
+    "model": "base",
+    "language": "auto-detect",
+    "confidence_threshold": 0.8,
+    "offline_mode": true,
+    "gpu_acceleration": "auto"
+  },
+
+  "// AGENT BEHAVIOR": {},
+  "agents": {
+    "default_model": "claude-3-5-sonnet",
+    "temperature": 0.7,
+    "max_tokens": 2048,
+    "tools": [
+      "call_transcription",
+      "caller_lookup",
+      "memory_retrieve",
+      "memory_update",
+      "send_notification",
+      "generate_response",
+      "escalate_call"
+    ],
+    "parallel_agents": 3,
+    "timeout_seconds": 60
+  },
+
+  "// COST & RATE LIMITS": {},
+  "cost_tracking": {
+    "enabled": true,
+    "alert_threshold_dollars": 10,
+    "daily_budget_dollars": 50,
+    "log_every_call": true
+  },
+
+  "// PHONE SYSTEM WEBHOOK": {},
+  "webhook": {
+    "port": 3001,
+    "endpoint": "/joul/incoming-call",
+    "auth_header": "${JOUL_WEBHOOK_SECRET}",
+    "timeout_seconds": 30,
+    "retry_attempts": 3
+  },
+
+  "// SECURITY & PRIVACY": {},
+  "security": {
+    "encrypt_caller_data": true,
+    "encrypt_memory": true,
+    "local_processing_only": true,
+    "no_external_voice_apis": true,
+    "audit_logging": true,
+    "rotation_keys_days": 30
+  },
+
+  "// DATABASE & STORAGE": {},
+  "storage": {
+    "type": "local_sqlite",
+    "path": "./data/joul-calls.db",
+    "backup_enabled": true,
+    "backup_interval_hours": 6
+  },
+
+  "// ENVIRONMENT VARIABLES": {},
+  "env_required": [
+    "JOUL_WEBHOOK_SECRET",
+    "JOUL_SLACK_WEBHOOK",
+    "ANTHROPIC_API_KEY"
+  ],
+  "env_optional": [
+    "JOUL_TWILIO_ACCOUNT",
+    "JOUL_TWILIO_TOKEN",
+    "OTEL_EXPORTER_OTLP_ENDPOINT"
+  ],
+
+  "// DOCUMENTATION": {},
+  "documentation": {
+    "setup_guide": "./JOUL_CLAUDE.md",
+    "resource_guide": "./joul-starter-kit.md",
+    "api_endpoint": "http://localhost:3001/joul/",
+    "dashboard": "http://localhost:3000"
+  }
+}
